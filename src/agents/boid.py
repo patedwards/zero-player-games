@@ -7,6 +7,8 @@ import dataclasses
 
 import numpy as np
 from agents.base import Agent, AgentTypes
+from typing import List, Dict, Union
+from numpy import ndarray
 
 REFLECTION = False
 
@@ -148,7 +150,7 @@ class Boid(Agent):
 
 class Ravenoid(Boid):
     """
-    A simple agent that chases boids base
+    A simple agent that chases boids, using internal logic only.
     """
 
     def __init__(self, controller=None, will_log=False):
@@ -166,3 +168,30 @@ class Ravenoid(Boid):
                 distance = calculate_distance(boid.position, self.position)
                 if distance < self.parameters.boid_death_zone:
                     boid.agent_type = AgentTypes.dead
+
+class RavenoidWithSteeringWheel(Boid):
+    """
+    A ravenoid that takes actions based on the environment.
+    """
+    def __init__(self, controller=None, will_log=False):
+        super().__init__(
+            controller=controller,
+        )
+        self.agent_type = AgentTypes.ravenoid
+        self.kill_count = 0
+        self.steering_action = [0, 0]
+
+    def steer(self) -> ndarray:
+        return np.array(self.steering_action)
+
+    def perform_step_logic(self, steering):
+        super().perform_step_logic(steering)
+        # and then if there are any boids nearby, kill them
+        self.kill_count = 0
+        boids = self.nearby_agents
+        for boid in boids:
+            if boid.agent_type == AgentTypes.boid:
+                distance = calculate_distance(boid.position, self.position)
+                if distance < self.parameters.boid_death_zone:
+                    boid.agent_type = AgentTypes.dead
+                    self.kill_count += 1

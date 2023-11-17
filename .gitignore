@@ -1,3 +1,15 @@
+# data files that can go up delibaretly
+*.zip
+*.mp4
+*.mp3
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.pdf
+*.doc
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
