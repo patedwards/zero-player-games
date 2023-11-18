@@ -43,13 +43,16 @@ class RavenChasingBoids(gym.Env):
         )
 
         # Define the action space
-        self.action_space = spaces.Discrete(5)
+        self.action_space = spaces.Discrete(8)
         self._action_to_direction = {
             0: [1.0, 0.0],  # Right
             1: [0.0, 1.0],  # Up
             2: [-1.0, 0.0],  # Left
             3: [0.0, -1.0],  # Down
-            4: [0.0, 0.0],  # Don't change velocity
+            4: [1.0, 1.0],  # Up-Right
+            5: [-1.0, 1.0],  # Up-Left
+            6: [-1.0, -1.0],  # Down-Left
+            7: [1.0, -1.0],  # Down-Right
         }
 
         assert (
@@ -123,12 +126,12 @@ class RavenChasingBoids(gym.Env):
             if agent.agent_type == "boid":
                 n_boids_alive += 1
 
-        # if the raven has killed 3 boids over the course of the episode, terminate
-        if self.n_boids - n_boids_alive >= 3:
+        # if the raven has killed 5 boids over the course of the episode, terminate
+        if self.n_boids - n_boids_alive >= 5:
             terminated = True
             self.history.append(self.n_steps)
 
-        if self.n_steps > 1000:
+        if self.n_steps > 10000:
             terminated = True
             self.history.append(self.n_steps)
 

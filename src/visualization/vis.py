@@ -56,8 +56,9 @@ class Vis:
             color = color_map.get(agent.agent_type, (255, 255, 255))
             self.draw(agent.position, color)
 
-        pygame.display.flip()
+        
         if human_mode:
+            pygame.display.flip()
             self.clock.tick(60)
 
         # Capture the screen surface and convert it to a numpy array
