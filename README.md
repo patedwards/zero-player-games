@@ -16,12 +16,14 @@ Some things I didn't realize when training:
 
 Also in this version, I set things up to run on remote GPU instances. Will use more of a script based approach rather than notebooks
 
-sudo docker build -t corvi
+`sudo docker build -t corvi .`
 
 > nohup sudo docker run --gpus all -v ./training:/app/training corvi training/training_111724_1.py > output.log 2>&1 &
 
 
 ### 0.3
 
-# Running
+training_111824_1 uses a different approach.
+
+1. it uses an array based observation with counts for each 
 

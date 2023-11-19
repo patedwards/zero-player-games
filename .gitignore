@@ -163,3 +163,5 @@ Testing/
 /.artifacts/
 # Pypoetry
 /.pypoetry/
+
+.DS_Store

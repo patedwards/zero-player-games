@@ -98,7 +98,7 @@ class PureBoinds(gym.Env):
         return observation, reward, terminated, False
 
     def render(self):
-        if self.render_mode == "rgb_array":
+        if self.render_mode == "human":
             return self._render_frame()
 
     def _render_frame(self):

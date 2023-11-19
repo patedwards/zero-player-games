@@ -62,7 +62,7 @@ class Boid(Agent):
         This might set a desired change in velocity but does not directly update the
         agent's position.
         """
-        boids = self.nearby_agents 
+        boids = self.nearby_agents
         # ignore dead boids
         boids = [boid for boid in boids if boid.agent_type != AgentTypes.dead]
         v1 = self.rule_cohesion(boids)
@@ -180,6 +180,9 @@ class RavenoidWithSteeringWheel(Boid):
         self.agent_type = AgentTypes.ravenoid
         self.kill_count = 0
         self.steering_action = [0, 0]
+
+    def update_steering(self, steering):
+        self.steering_action = steering
 
     def steer(self) -> ndarray:
         return np.array(self.steering_action)

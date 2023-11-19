@@ -11,7 +11,7 @@ def main():
     controller.world.top = n
     controller.world.right = n
 
-    env = BoidsWithRavenoid(200, render_mode="human", 
+    env = BoidsWithRavenoid(100, render_mode="human", 
                      controller=lambda : controller,
                      window_size=n)
 
