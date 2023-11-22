@@ -71,7 +71,7 @@ def main(training_script):
     run_command_over_ssh(ssh_command, "sh build.sh", config)
 
     # run the specified training script via docker
-    docker_command = f"docker run --label {training_script}  742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app:latest {training_script}"
+    docker_command = f"docker run --label training_script={training_script}  742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app:latest {training_script}"
     run_command_over_ssh(ssh_command, docker_command, config)
 
 
