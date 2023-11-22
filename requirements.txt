@@ -9,4 +9,5 @@ gymnasium>=0.29.1
 imageio>=2.32.0
 stable-baselines3>=2.1.0
 pygame>=2.1.0
+boto3==1.29.4
 
