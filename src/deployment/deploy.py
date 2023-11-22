@@ -46,7 +46,7 @@ def main():
     run_command_over_ssh(ssh_command, f'git pull origin {new_branch_name}', config)
 
     # run the `.build.sh` script that's on the EC2 instance
-    run_command_over_ssh(ssh_command, './.build.sh', config)
+    run_command_over_ssh(ssh_command, 'sh build.sh', config)
 
     # run the training script via docker
     docker_command = "docker run 742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app:latest train_xxx.py"
