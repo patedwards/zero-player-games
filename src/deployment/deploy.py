@@ -19,17 +19,12 @@ def get_unique_identifier():
     date_string = datetime.datetime.now().strftime("%m%d%y")
     return date_string + "_" + "".join(random.choice(characters) for _ in range(6))
 
-
-def is_script_running(ssh_command, script_name, config):
-    check_command = f"docker ps --filter ancestor=742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app:latest --format '{{{{.Command}}}}' | grep '{script_name}'"
-    print("Checking if script is running...", check_command)
+def is_container_with_label_running(ssh_command, label, config):
+    check_command = f"docker ps --filter '{label}' --format '{{{{.Names}}}}'"
     full_command = f"{ssh_command} '{check_command}'"
-    process = subprocess.Popen(
-        full_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
+    process = subprocess.Popen(full_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
-    return process.returncode == 0 and stdout.decode("utf-8").strip() != ""
-
+    return process.returncode == 0 and stdout.decode('utf-8').strip() != ""
 
 def main(training_script):
     """
@@ -44,10 +39,13 @@ def main(training_script):
     ec2_address = get_ec2_address(config["ec2_instance_id"])
     ssh_key_path = config["ssh_key_path"]
     ssh_command = f"ssh -i {ssh_key_path} ec2-user@{ec2_address}"
+    
+    container_label = f"label=training_script_{training_script}"
 
-    if is_script_running(ssh_command, training_script, config):
+    if is_container_with_label_running(ssh_command, container_label, config):
         print(f"The script {training_script} is already running in a container.")
         return
+    
 
     # Create a new branch: git checkout -b <branch_name>
     new_branch_name = f"training_{get_unique_identifier()}"
@@ -72,7 +70,7 @@ def main(training_script):
     run_command_over_ssh(ssh_command, "sh build.sh", config)
 
     # run the specified training script via docker
-    docker_command = f"docker run 742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app:latest {training_script}"
+    docker_command = f"docker run --label training_script={training_script}  742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app:latest {training_script}"
     run_command_over_ssh(ssh_command, docker_command, config)
 
 
