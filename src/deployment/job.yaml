@@ -1,4 +1,0 @@
-job:
- - name: something
- - image: something
- - command: something

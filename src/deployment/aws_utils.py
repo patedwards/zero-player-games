@@ -4,6 +4,16 @@ This module contains utility functions for AWS
 
 import boto3
 
+def save_model(model, filename):
+    """
+    Save the model to the filename and upload it to S3
+    """
+    model.save(filename)
+    # upload model to S3
+    s3 = boto3.resource("s3")
+    bucket = s3.Bucket("raven-training-data")
+    bucket.upload_file(filename, filename)
+
 def get_ec2_address(instance_id):
     """
     Get the public IP address of the EC2 instance. If the instance
