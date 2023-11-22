@@ -8,14 +8,14 @@ from models.follow_me_model import JustFollowModel
 
 def main():
     env = RavenChasingBoids(20, render_mode="human", observation_type="array")
-    #model = DQN.load("training/model_training_111824_1", env=env)
-    model = JustFollowModel(env)
+    model = DQN.load("training/model_training_111924_3", env=env)
+    #model = JustFollowModel(env)
 
     vec_env = model.get_env()
     obs = vec_env.reset()
     while True:
         action, _states = model.predict(obs, deterministic=True)
-        obs, rewards, terminated, tuncated, info = vec_env.step(action)
+        obs, rewards, terminated, info = vec_env.step(action)
         
 
 

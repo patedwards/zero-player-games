@@ -149,7 +149,7 @@ class RavenChasingBoids(gym.Env):
         info = self._get_info()
         observation = self._get_obs()
 
-        return observation
+        return observation, info
 
     def take_action(self, action):
         steering = self._action_to_direction[action]
@@ -180,7 +180,7 @@ class RavenChasingBoids(gym.Env):
                 n_boids_alive += 1
 
         # if the raven has killed 5 boids over the course of the episode, terminate
-        if self.n_boids - n_boids_alive >= 5:
+        if self.n_boids - n_boids_alive >= 10:
             terminated = True
             self.history.append(self.n_steps)
 

@@ -1,5 +1,8 @@
 """
 Setup file for zero-player-games package
+
+To add this kernel to jupyter, run the following command in the terminal:
+python -m ipykernel install --user --name zero-player-games
 """
 from setuptools import setup, find_packages
 

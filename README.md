@@ -27,3 +27,4 @@ training_111824_1 uses a different approach.
 
 1. it uses an array based observation with counts for each 
 
+### 0.3.1 Found an annoying bug, trying to run again

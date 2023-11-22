@@ -96,8 +96,7 @@ class Agent(ABC):
             return
         self.nearby_agents = self.get_nearby_agents()
         steering = self.steer()
-        if self.agent_type == AgentTypes.ravenoid:
-            print("Steering: ", steering)
+      
         self.perform_step_logic(steering)
         self.handle_boundaries()
         self.report_position()
