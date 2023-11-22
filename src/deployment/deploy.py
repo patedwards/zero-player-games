@@ -1,117 +1,74 @@
+# pylint: disable-all
 """
-This is a script to deploy the application to AWS EC2 using AWS ECR.
+This is a script to deploy the training script to an EC2 instance.
 """
-import argparse
+import os
 import subprocess
-import boto3
-import paramiko
 
-def main(args):
+import random
+import string
+
+def get_unique_identifier():
     """
-    This deploy script takes the file path to a python file that needs
-    to be run on EC2 as an argument. It then builds a Docker image,
-    pushes it to AWS ECR, spins up an EC2 instance, and runs the
-    Docker image on the EC2 instance.
-
-    Args:
-        args (list): A list of arguments. The first argument should be
-        the file path to a python file that needs to be run on EC2.
-
+    Return a 6-digit unique identifier with letters and numbers.
     """
+    characters = string.ascii_letters + string.digits  # Combines letters and digits
+    return ''.join(random.choice(characters) for _ in range(6))
 
-    # Get the file path to the python file that needs to be run on EC2
-    python_file_path = args.python_file
-    build_base_image = args.build_base_image
-    build_app_image = args.build_app_image
+def main():
+    """
+    Main function to deploy training script to EC2 instance.
+    """
+    
+    # read the configs
+    config = read_config()
+    
+    # Create a new branch: git checkout -b <branch_name>
+    new_branch_name = f"training_{get_unique_identifier()}"
+    subprocess.run(['git', 'checkout', '-b', new_branch_name])
 
-    docker_image_name = "patwards/corvusio-app"
+    # Add everything to the new branch: git add .
+    subprocess.run(['git', 'add', '.'])
 
-    # Step 1: Build the Docker image
-    if build_base_image:
-        subprocess.run(
-            [
-                "docker",
-                "build",
-                "-t",
-                "patwards/corvusio-base:latest",
-                "-f",
-                "Dockerfile.base",
-                ".",
-            ],
-            check=True,
-        )
+    # Commit the changes: git commit -m "message"
+    subprocess.run(['git', 'commit', '-m', 'Deploying training script'])
 
-    # Step 2: push the Docker image to Docker Hub
+    # Push the changes to the new branch: git push origin <branch_name>
+    subprocess.run(['git', 'push', 'origin', new_branch_name])
 
-    if build_app_image:
-        subprocess.run(
-            ["docker", "build", "-t", f"{docker_image_name}:latest", "."], check=True
-        )
+    # Connect to the EC2 instance
+    ec2_address = config['ec2_address']
+    ssh_key_path = config['ssh_key_path']
+    ssh_command = f"ssh -i {ssh_key_path} ec2-user@{ec2_address}"
 
-    ecr_repository_uri = "742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app"
-    # Step 3: Tag the Docker image with the ECR repository URI
-    subprocess.run(
-        ["docker", "tag", f"{docker_image_name}:latest", ecr_repository_uri],
-        check=True
-    )
+    # git fetch and git pull on the training branch on EC2 instance
+    run_command_over_ssh(ssh_command, 'git fetch')
+    run_command_over_ssh(ssh_command, f'git pull origin {new_branch_name}')
 
-    # Step 4: Push the image to the ECR repository using aws, following this
-    # pattern: aws ecr get-login-password --region region | docker login --username AWS --password-stdin aws_account_id.dkr.ecr.region.amazonaws.com
+    # run the `.build.sh` script that's on the EC2 instance
+    run_command_over_ssh(ssh_command, './.build.sh')
+
+    # run the training script via docker
+    docker_command = "docker run 742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app:latest train_xxx.py"
+    run_command_over_ssh(ssh_command, docker_command)
 
 
-    # aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app
-    # docker tag patwards/corvusio-base:latest 742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app
-    # docker push 742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app
+def read_config():
+    return {
+        'ec2_address': 'ec2-3-133-137-118.us-east-2.compute.amazonaws.com',
+        'ssh_key_path': 'secrets/image-builder-key-pair.pem',
+    }
 
-    # Step 5: Spin up an AWS EC2 instance
-    ec2 = boto3.resource("ec2")
-    instance = ec2.create_instances(
-        ImageId="ami-06d4b7182ac3480fa",
-        MinCount=1,
-        MaxCount=1,
-        InstanceType="t2.medium",
-    )[0]
-    # Wait for the instance to be running...
-    instance.wait_until_running()
 
-    # Step 6: SSH into the instance and run the Docker image
-    ssh_client = paramiko.SSHClient()
-    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-    # Replace with your instance's IP and key
-    ssh_client.connect(
-        hostname=instance.public_ip_address,
-        username="ec2-user",
-        key_filename="~/.aws/credentials",
-    )
-
-    # Run the Docker image
-    stdin, stdout, stderr = ssh_client.exec_command(
-        f"docker run {ecr_repository_uri}:latest {python_file_path}"
-    )
-    print(stdin, stdout.read(), stderr)
+def run_command_over_ssh(ssh_command, command):
+    full_command = f"{ssh_command} '{command}'"
+    process = subprocess.Popen(full_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode != 0:
+        print(f"Error executing command: {stderr}")
+    else:
+        print(stdout)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Deploy script for running a Python file on AWS EC2 using AWS ECR"
-    )
-    parser.add_argument(
-        "python_file",
-        type=str,
-        help="File path to the Python file that needs to be run on EC2",
-    )
-    parser.add_argument(
-        "--build-base-image",
-        type=bool,
-        default=False,
-        help="Build the base image for the application",
-    )
-    parser.add_argument(
-        "--build-app-image",
-        type=bool,
-        default=False,
-        help="Build the application image",
-    )
-    args_ = parser.parse_args()
-    main(args_)
+    main()

@@ -28,7 +28,7 @@ RUN pip install --upgrade pip
 
 # Install PyTorch with GPU support - not including `torchvision torchaudio` for now
 RUN pip install torch --extra-index-url https://download.pytorch.org/whl/cu113
-
+RUN pip install swig --ignore-installed
 # Set the working directory in the Docker image
 WORKDIR /app
 
@@ -38,6 +38,6 @@ COPY setup.py /app/setup.py
 COPY requirements.txt /app/requirements.txt
 
 # Install local module
-RUN pip install -e . --ignore-installed
+RUN pip install -e . 
 
 
