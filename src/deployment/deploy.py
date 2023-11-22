@@ -21,7 +21,6 @@ def get_unique_identifier():
 
 def is_container_with_label_running(ssh_command, label, config):
     check_command = f"docker ps --filter '{label}' --format '{{{{.Names}}}}'"
-    print(check_command)
     full_command = f"{ssh_command} '{check_command}'"
     process = subprocess.Popen(full_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
@@ -41,10 +40,20 @@ def main(training_script):
     ssh_key_path = config["ssh_key_path"]
     ssh_command = f"ssh -i {ssh_key_path} ec2-user@{ec2_address}"
     
-    container_label = f"label=training_script_{training_script}"
+    container_label = f"label=training_script={training_script}"
 
     if is_container_with_label_running(ssh_command, container_label, config):
-        print(f"The script {training_script} is already running in a container.")
+        # format this in a big fancy way, plenty of line's and #'s
+        print(f"""
+❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌
+There is already a container running with the label {container_label}.
+If you want to run a new training script, please stop the container with the following command:
+
+docker stop $(docker ps --filter '{container_label}' --format '{{{{.Names}}}}')
+❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌
+        """)
+
+        
         return
     
 
