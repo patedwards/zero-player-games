@@ -22,6 +22,7 @@ def get_unique_identifier():
 
 def is_script_running(ssh_command, script_name, config):
     check_command = f"docker ps --filter ancestor=742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app:latest --format '{{{{.Command}}}}' | grep '{script_name}'"
+    print("Checking if script is running...", check_command)
     full_command = f"{ssh_command} '{check_command}'"
     process = subprocess.Popen(
         full_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
