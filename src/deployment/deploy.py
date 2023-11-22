@@ -2,9 +2,9 @@
 """
 This is a script to deploy the training script to an EC2 instance.
 """
+import argparse
 import os
 import subprocess
-
 import random
 import string
 
@@ -15,7 +15,7 @@ def get_unique_identifier():
     characters = string.ascii_letters + string.digits  # Combines letters and digits
     return ''.join(random.choice(characters) for _ in range(6))
 
-def main():
+def main(training_script):
     """
     Main function to deploy training script to EC2 instance.
     """
@@ -49,8 +49,8 @@ def main():
     # run the `.build.sh` script that's on the EC2 instance
     run_command_over_ssh(ssh_command, 'sh build.sh', config)
 
-    # run the training script via docker
-    docker_command = "docker run 742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app:latest train_xxx.py"
+    # run the specified training script via docker
+    docker_command = f"docker run 742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app:latest {training_script}"
     run_command_over_ssh(ssh_command, docker_command, config)
 
 
@@ -74,4 +74,8 @@ def run_command_over_ssh(ssh_command, command, config):
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description='Deploy training script to EC2 instance.')
+    parser.add_argument('--training-script', required=True, help='The path of the training script to deploy')
+    args = parser.parse_args()
+
+    main(args.training_script)
