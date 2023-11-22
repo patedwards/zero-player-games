@@ -28,3 +28,12 @@ training_111824_1 uses a different approach.
 1. it uses an array based observation with counts for each 
 
 ### 0.3.1 Found an annoying bug, trying to run again
+
+### 0.3.2 Spent some time on infra
+
+# Setup and deployment
+
+Use the `training/training_0TEMPLATE.py` to create a training file and test locally first.
+
+Then just call the following to deploy to EC2:
+> python -m deployment.deploy --training-script training/training_111924_3.py 
