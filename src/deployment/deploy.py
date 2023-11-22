@@ -42,6 +42,7 @@ def main():
     ssh_command = f"ssh -i {ssh_key_path} ec2-user@{ec2_address}"
 
     # git fetch and git pull on the training branch on EC2 instance
+    run_command_over_ssh(ssh_command, 'git stash', config)
     run_command_over_ssh(ssh_command, 'git fetch', config)
     run_command_over_ssh(ssh_command, f'git pull origin {new_branch_name}', config)
 
