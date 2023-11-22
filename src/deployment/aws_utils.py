@@ -11,8 +11,9 @@ def save_model(model, filename):
     model.save(filename)
     # upload model to S3
     s3 = boto3.resource("s3")
-    bucket = s3.Bucket("raven-training-data")
-    bucket.upload_file(filename, filename)
+    bucket = s3.Bucket("corvusio-data")
+    bucket.upload_file(filename + ".zip", f"training/{filename}.zip")
+
 
 def get_ec2_address(instance_id):
     """
