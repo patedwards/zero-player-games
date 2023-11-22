@@ -165,3 +165,5 @@ Testing/
 /.pypoetry/
 
 .DS_Store
+
+aws-scripts

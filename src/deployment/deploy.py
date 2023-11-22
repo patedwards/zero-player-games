@@ -59,7 +59,7 @@ def main(args):
     # pattern: aws ecr get-login-password --region region | docker login --username AWS --password-stdin aws_account_id.dkr.ecr.region.amazonaws.com
 
 
-    # aws ecr get-log-password --region us-east-2 | docker login --username AWS --password-stdin 742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app
+    # aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app
     # docker tag patwards/corvusio-base:latest 742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app
     # docker push 742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app
 

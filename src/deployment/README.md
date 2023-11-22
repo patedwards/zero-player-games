@@ -1,12 +1,21 @@
+## Setting up AWS EC2 things
+
+- permissions
+   - github tokens
+- ECR: 
+  - create an ECR and save it to local dev environments
+
+
+
 Todo:
 - rename covusio-base to corvusio-base
 
-# Config
+# Structure of a training run
 
-model = ... # this includes parameters
-env = ... # this includes parameters
-data = ... # a zip file of the data
-timesteps = ...
+base-env: core dependencies
+dev-env: modules I've developed for training etc
+data: any data needed for training
+runner-script: the script that relies on the base-env, dev-env and data. Includes all parameters. Runs model. Looks after loading and unloading of data.
 
 # Running 
 
@@ -44,3 +53,18 @@ docker build -f Dockerfile.app -t patwards/covusio-app:latest .
 # THoughts
 
 This workflow could be applied to federated learning. The ECRs could be delployed on K8s.
+
+
+# This could be more than I need to do...
+
+I just want to have a command "run-on-cloud"
+
+Option A - 
+- Run a script to deploy that pushes everything to ECR and then spins up that container on a new EC2 instance
+  
+Option B - 
+- Maintain an instance that on launch does the following:
+   - pulls from git
+   - builds the base image if there are detected changes
+   - builds the app image if there are detected changes
+   - looks at the "job-queue"
