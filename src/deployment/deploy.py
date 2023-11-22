@@ -21,6 +21,7 @@ def get_unique_identifier():
 
 def is_container_with_label_running(ssh_command, label, config):
     check_command = f"docker ps --filter '{label}' --format '{{{{.Names}}}}'"
+    print(check_command)
     full_command = f"{ssh_command} '{check_command}'"
     process = subprocess.Popen(full_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
