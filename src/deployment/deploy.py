@@ -42,15 +42,15 @@ def main():
     ssh_command = f"ssh -i {ssh_key_path} ec2-user@{ec2_address}"
 
     # git fetch and git pull on the training branch on EC2 instance
-    run_command_over_ssh(ssh_command, 'git fetch')
-    run_command_over_ssh(ssh_command, f'git pull origin {new_branch_name}')
+    run_command_over_ssh(ssh_command, 'git fetch', config)
+    run_command_over_ssh(ssh_command, f'git pull origin {new_branch_name}', config)
 
     # run the `.build.sh` script that's on the EC2 instance
-    run_command_over_ssh(ssh_command, './.build.sh')
+    run_command_over_ssh(ssh_command, './.build.sh', config)
 
     # run the training script via docker
     docker_command = "docker run 742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app:latest train_xxx.py"
-    run_command_over_ssh(ssh_command, docker_command)
+    run_command_over_ssh(ssh_command, docker_command, config)
 
 
 def read_config():
