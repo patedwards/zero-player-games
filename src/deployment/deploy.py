@@ -8,6 +8,7 @@ import subprocess
 import random
 import string
 import datetime
+from deployment.aws_utils import get_ec2_address
 
 def get_unique_identifier():
     """
@@ -39,7 +40,7 @@ def main(training_script):
     subprocess.run(['git', 'push', 'origin', new_branch_name])
 
     # Connect to the EC2 instance
-    ec2_address = config['ec2_address']
+    ec2_address = get_ec2_address(config['ec2_instance_id'])
     ssh_key_path = config['ssh_key_path']
     ssh_command = f"ssh -i {ssh_key_path} ec2-user@{ec2_address}"
 
@@ -59,7 +60,7 @@ def main(training_script):
 
 def read_config():
     return {
-        'ec2_address': 'ec2-3-133-137-118.us-east-2.compute.amazonaws.com',
+        'ec2_instance_id': 'i-0719e2cd7abbbb37a',
         'ssh_key_path': 'secrets/image-builder-key-pair.pem',
         'ec2_repo_path': '/home/ec2-user/repos/zero-player-games',
     }

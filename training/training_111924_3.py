@@ -5,11 +5,15 @@ it will go for 2e7 steps instead of 2e6."""
 from environments.model_ready_boids import RavenChasingBoids
 from stable_baselines3 import DQN
 import sys
+import boto3
 
 
 def save_model(model, filename):
     model.save(filename)
-
+    # upload model to S3
+    s3 = boto3.resource("s3")
+    bucket = s3.Bucket("raven-training-data")
+    bucket.upload_file(filename, filename)
 
 def main():
     # admin parameters
