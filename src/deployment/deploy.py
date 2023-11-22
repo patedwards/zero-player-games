@@ -57,11 +57,13 @@ def read_config():
     return {
         'ec2_address': 'ec2-3-133-137-118.us-east-2.compute.amazonaws.com',
         'ssh_key_path': 'secrets/image-builder-key-pair.pem',
+        'ec2_repo_path': '/home/ec2-user/repos/zero-player-games',
     }
 
 
-def run_command_over_ssh(ssh_command, command):
-    full_command = f"{ssh_command} '{command}'"
+def run_command_over_ssh(ssh_command, command, config):
+    repo_path = config['ec2_repo_path']
+    full_command = f"{ssh_command} 'cd {repo_path} && {command}'"
     process = subprocess.Popen(full_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     if process.returncode != 0:
