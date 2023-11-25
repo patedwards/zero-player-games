@@ -187,7 +187,7 @@ class RavenChasingBoids(gym.Env):
             agent.update()
 
         if self.render_mode == "human":
-            self._render_frame()
+            self.render()
 
         observation = self._get_obs()
         reward = 10 * self.ravenoid.kill_count

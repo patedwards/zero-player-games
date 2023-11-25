@@ -11,7 +11,7 @@ from functools import partial
 DEFAULT_MODEL = partial(DQN, "MlpPolicy", verbose=1)
 DEFAULT_ENV = partial(RavenChasingBoids, 20, render_mode="rgb_array", observation_type="array")
 
-def main(model_obj=DEFAULT_MODEL, total_timesteps=2e3):
+def main(model_obj=DEFAULT_MODEL, total_timesteps=2e7):
     # admin parameters
     model_filename = "training/model_" + __file__.split("/")[-1].split(".")[0]
     

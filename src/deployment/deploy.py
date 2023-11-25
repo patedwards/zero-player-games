@@ -38,7 +38,8 @@ def main(training_script):
 
     ec2_address = get_ec2_address(config["ec2_instance_id"])
     ssh_key_path = config["ssh_key_path"]
-    ssh_command = f"ssh -i {ssh_key_path} ec2-user@{ec2_address}"
+    # ssh_command = f"ssh -i {ssh_key_path} ec2-user@{ec2_address}"
+    ssh_command = f"ssh -o StrictHostKeyChecking=no -i {ssh_key_path} ec2-user@{ec2_address}"
     
     container_label = f"label=training_script={training_script}"
 

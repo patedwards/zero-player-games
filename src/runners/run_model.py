@@ -8,7 +8,7 @@ from models.follow_me_model import JustFollowModel
 
 def main():
     env = RavenChasingBoids(20, render_mode="human", observation_type="array")
-    model = DQN.load("training/model_training_111924_3", env=env)
+    model = DQN.load("training/model_training_111923_3", env=env)
     #model = JustFollowModel(env)
 
     vec_env = model.get_env()
