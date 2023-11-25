@@ -13,7 +13,7 @@ from agents.boid import Boid, RavenoidWithSteeringWheel
 
 
 def create_visual_observation_space():
-    return spaces.Box(low=0, high=255, shape=(70, 70, 3), dtype=np.uint8)
+    return spaces.Box(low=0, high=2, shape=(70, 70), dtype=np.uint8)
 
 
 def create_array_observation_space():
@@ -101,7 +101,7 @@ class RavenChasingBoids(gym.Env):
 
         self.vis = Vis(screen_height=self.window_size, screen_width=self.window_size)
 
-    def get_visual_observation(self):
+    def get_visual_observation(self, human_mode=False):
         assert self.observation_type == "visual"
         agents = self.controller.find_nearby(self.ravenoid.id) + [self.ravenoid]
         # make the center the round position of the ravenoid
@@ -117,7 +117,7 @@ class RavenChasingBoids(gym.Env):
         }
         frame = self.vis.draw_agents(
             agents,
-            human_mode=False,
+            human_mode=human_mode,
             recenter_position=center,
             crop_size=93,
             color_map=color_map,

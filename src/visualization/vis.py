@@ -43,6 +43,24 @@ class Vis:
     def draw(self, position, color=(255, 255, 255)):
         pygame.draw.circle(self.screen, color, (int(position[0]), int(position[1])), 3)
 
+    def draw_agents_to_array(self, agents):
+        image_array = np.zeros((256, 256), dtype=np.uint8)
+
+        # Process each agent in the data
+        for agent in agents:
+            x, y = agent.position
+            # Round the positions to nearest integer and ensure they are within the 256x256 grid
+            x = min(max(int(round(x)), 0), 255)
+            y = min(max(int(round(y)), 0), 255)
+
+            # Set the pixel value based on agent type
+            if agent.agent_type == "boid":
+                image_array[y, x] = 1
+            elif agent.agent_type == "raven":
+                image_array[y, x] = 2
+
+        return image_array
+
     def draw_agents(
         self,
         agents,
@@ -52,6 +70,15 @@ class Vis:
         color_map=DEFAULT_COLOR_MAP,
         show_ravenoid_circle=True,
     ):
+        if not human_mode:
+            array = self.draw_agents_to_array(agents)
+            if recenter_position is not None:
+                array = center_image_around_pixel(array, recenter_position)
+            if crop_size is not None:
+                array = array[crop_size:-crop_size, crop_size:-crop_size]
+
+                return array
+
         self.screen.fill((0, 0, 0))
         for agent in agents:
             color = color_map.get(agent.agent_type, (255, 255, 255))
