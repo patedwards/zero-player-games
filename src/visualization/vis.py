@@ -50,22 +50,24 @@ class Vis:
         crop_size=None,
         recenter_position=None,
         color_map=DEFAULT_COLOR_MAP,
+        show_ravenoid_circle=True,
     ):
         self.screen.fill((0, 0, 0))
         for agent in agents:
             color = color_map.get(agent.agent_type, (255, 255, 255))
             self.draw(agent.position, color)
 
-        # draw a circle of radius 10 around the ravenoid
-        ravenoid = [agent for agent in agents if agent.agent_type == "ravenoid"][0]
-        # the circle should only have the outlines, not be filled
-        pygame.draw.circle(
-            self.screen,
-            (0, 0, 255),
-            (int(ravenoid.position[0]), int(ravenoid.position[1])),
-            40,
-            1,
-        )
+        if show_ravenoid_circle:
+            # draw a circle of radius 10 around the ravenoid
+            ravenoid = [agent for agent in agents if agent.agent_type == "ravenoid"][0]
+            # the circle should only have the outlines, not be filled
+            pygame.draw.circle(
+                self.screen,
+                (0, 0, 255),
+                (int(ravenoid.position[0]), int(ravenoid.position[1])),
+                40,
+                1,
+            )
         if human_mode:
             pygame.display.flip()
             self.clock.tick(60)

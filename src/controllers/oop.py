@@ -41,7 +41,7 @@ class OOPController(Controller):
             return {"error": "Agent not found"}
 
         self_hex = self.agent_data[agent_id].h3_index
-        nearby_hexes = h3.k_ring(self_hex, 1)
+        nearby_hexes = h3.k_ring(self_hex, 2)
         nearby_hexes.add(self_hex)
 
         nearby_agents = []

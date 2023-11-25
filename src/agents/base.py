@@ -54,7 +54,7 @@ class Agent(ABC):
 
     def __repr__(self):
         return (
-            f"Agent(id={self.id}, position={self.position}, velocity={self.velocity})"
+            f"Agent(id={self.id}, position={self.position}, velocity={self.velocity}), agent_type={self.agent_type}"
         )
 
     def add_h3_index(self, h3_index: str) -> None:

@@ -12,40 +12,62 @@ from visualization.vis import Vis
 from agents.boid import Boid, RavenoidWithSteeringWheel
 
 
+def create_visual_observation_space():
+    return spaces.Box(low=0, high=255, shape=(70, 70, 3), dtype=np.uint8)
+
+
+def create_array_observation_space():
+    return spaces.Box(
+        # TODO: do we need float64 here? Can we use float32?
+        low=0,
+        high=100,
+        shape=(8,),
+        dtype=np.float64,
+    )
+
+
 class RavenChasingBoids(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 4}
 
     def __init__(
-        self, n_boids, render_mode=None, controller=OOPController, window_size=256,
-        observation_type="visual"
+        self,
+        n_boids,
+        render_mode=None,
+        controller=OOPController,
+        window_size=256,
+        observation_type="visual",
     ):
         self.controller_class = controller
         self.n_boids = n_boids
+
         self.render_mode = render_mode
         self.window_size = window_size
-        self.setup_simulation()
+
         self.history = []
         self.observation_type = observation_type
         self.previous_action = None
 
+        self.setup_simulation()
+
     def setup_simulation(self):
         self.controller = self.controller_class()
         self.n_steps = 0
+
         # add n_walkers boids to the simulation
         for _ in range(self.n_boids):
             self.controller.report_position(Boid(controller=self.controller))
+
         # add a ravenoid
         self.ravenoid = RavenoidWithSteeringWheel(controller=self.controller)
         self.controller.report_position(self.ravenoid)
 
-        # Unused? self.image_size = self.controller.world.width, self.controller.world.height
-
         # Use a discrete observation space broken into 8 directions, where
         # we'll count the number of boids in each direction
 
-        # TODO: do we need float64 here? Can we use float32?
-        self.observation_space = spaces.Box(
-            low=0, high=100, shape=(8,), dtype=np.float64
+        self.observation_space = (
+            create_visual_observation_space()
+            if self.observation_type == "visual"
+            else create_array_observation_space()
         )
 
         # Define the action space
@@ -77,12 +99,11 @@ class RavenChasingBoids(gym.Env):
         self.window = None
         self.clock = None
 
-        # init the visualization state
         self.vis = Vis(screen_height=self.window_size, screen_width=self.window_size)
 
     def get_visual_observation(self):
-        human_mode = self.render_mode == "human"
-        agents = self.controller.get_agents()
+        assert self.observation_type == "visual"
+        agents = self.controller.find_nearby(self.ravenoid.id) + [self.ravenoid]
         # make the center the round position of the ravenoid
         center = np.round(self.ravenoid.position).astype(int)
         color_map = {
@@ -96,14 +117,16 @@ class RavenChasingBoids(gym.Env):
         }
         frame = self.vis.draw_agents(
             agents,
-            human_mode=human_mode,
+            human_mode=False,
             recenter_position=center,
-            crop_size=80,
+            crop_size=93,
             color_map=color_map,
+            show_ravenoid_circle=False,
         )
         return frame
 
     def get_array_observation(self):
+        assert self.observation_type == "array"
         # TODO: this won't have the ability to see over to the next boundary
         nearby_agents = self.ravenoid.nearby_agents
         sight_distance = 40
@@ -154,7 +177,7 @@ class RavenChasingBoids(gym.Env):
     def take_action(self, action):
         steering = self._action_to_direction[action]
         self.ravenoid.update_steering(steering)
-        
+
         self.ravenoid.steer()
 
     def step(self, action: int) -> tuple:
@@ -167,7 +190,7 @@ class RavenChasingBoids(gym.Env):
             self._render_frame()
 
         observation = self._get_obs()
-        reward = 10*self.ravenoid.kill_count
+        reward = 10 * self.ravenoid.kill_count
         if self.previous_action != action:
             reward += 0.01
         self.previous_action = action
@@ -194,10 +217,6 @@ class RavenChasingBoids(gym.Env):
         return observation, reward, terminated, truncated, info
 
     def render(self):
-        if self.render_mode == "rgb_array":
-            return self._render_frame()
-
-    def _render_frame(self):
         human_mode = self.render_mode == "human"
         agents = self.controller.get_agents()
         frame = self.vis.draw_agents(agents, human_mode=human_mode)
