@@ -36,6 +36,7 @@ class BoidParameters:
     separation_weight: float = 0.05
     alignment_weight: float = 0.05
     boid_death_zone: float = 3
+    danger_turn_angle: float = 90
 
 
 class Boid(Agent):
@@ -100,10 +101,10 @@ class Boid(Agent):
         for boid in boids:
             distance = calculate_distance(boid.position, self.position)
             if boid.agent_type == AgentTypes.ravenoid:
-                # then turn 90 degrees
-                new_velocity = np.array(
-                    [self.velocity[1], -self.velocity[0]]
-                )   
+                # Turn by a provided amount
+                angle = np.radians(self.parameters.danger_turn_angle)
+                rotation_matrix = np.array([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]])
+                new_velocity = np.dot(rotation_matrix, self.velocity)
                 return new_velocity * self.parameters.alignment_weight
             elif (
                 distance < self.parameters.alignment_tolerance
@@ -182,6 +183,9 @@ class RavenoidWithSteeringWheel(Boid):
         self.steering_action = [0, 0]
 
     def update_steering(self, steering):
+        """
+        Todo: add docstring
+        """
         self.steering_action = steering
 
     def steer(self) -> ndarray:
