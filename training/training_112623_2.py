@@ -1,16 +1,28 @@
+# pylint: disable-all
 import logging
 import sys
 from functools import partial
 from environments.model_ready_boids import RavenChasingBoids
-from stable_baselines3 import DQN
+from stable_baselines3 import PPO
 from deployment.aws_utils import save_model
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-DEFAULT_MODEL = partial(DQN, "MlpPolicy", verbose=1)
-DEFAULT_ENV = partial(RavenChasingBoids, 20, render_mode="rgb_array", observation_type="array")
+DEFAULT_MODEL = partial(
+    PPO,
+    "MlpPolicy",
+    verbose=1,
+    n_steps=4096,
+    batch_size=64,
+    n_epochs=10,
+    device="auto",
+    _init_setup_model=True,
+)
+DEFAULT_ENV = partial(
+    RavenChasingBoids, 20, render_mode="rgb_array", observation_type="visual"
+)
 
 def main(model_obj=DEFAULT_MODEL, total_timesteps=2e7):
     model_filename = "training/model_" + __file__.split("/")[-1].split(".")[0]

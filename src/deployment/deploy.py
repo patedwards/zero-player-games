@@ -79,8 +79,8 @@ docker stop $(docker ps --filter '{container_label}' --format '{{{{.Names}}}}')
     # run the `.build.sh` script that's on the EC2 instance
     run_command_over_ssh(ssh_command, "sh build.sh", config)
 
-    # run the specified training script via docker
-    docker_command = f"docker run --label training_script={training_script}  742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app:latest {training_script}"
+    # run the specified training script via docker, and pipe the output to a log file
+    docker_command = f"docker run --label training_script={training_script}  742309522247.dkr.ecr.us-east-2.amazonaws.com/corvusio-app:latest {training_script} > {training_script}.log"
     run_command_over_ssh(ssh_command, docker_command, config)
 
 
