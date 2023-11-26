@@ -1,4 +1,5 @@
-# data files that can go up delibaretly
+# data files that can go up delibaretly, not via --all
+data
 *.zip
 *.mp4
 *.mp3
