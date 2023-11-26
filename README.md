@@ -33,6 +33,9 @@ training_111824_1 uses a different approach.
 
 # Setup and deployment
 
+Notes:
+- can only deploy one model at a time. Need to enable parallel models on the same instance, potentially. 
+
 Use the `training/training_0TEMPLATE.py` to create a training file and test locally first.
 
 Then just call the following to deploy to EC2:
